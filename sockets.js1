@@ -1,0 +1,575 @@
+/**
+ * Created by SQB on 2015/9/7.
+ */
+
+module.exports =function(io,redis,mysql,moment){
+    //客户端登录验证
+    console.log('validating');
+
+    //设置心跳间隔和心跳超时时间，如果timeout后，服务器端关闭连接
+    io.set('heartbeat interval', 5000);
+    io.set('heartbeat timeout', 60000);
+
+    //聊天类型
+    //1.对同一个聊天室的所有人发送信息（包括自己）
+    //  p2c（people to chatroom）
+
+    //redis中对应关系
+    //1.socketid与用户id对应,
+
+
+
+//加入聊天房间示例
+    //io.on('connection',function(socket){
+    //    socket.on('firefox',function(data){
+    //        console.log('welcome directive to firefox!',data);
+    //        socket.join('firefox');
+    //        //broadcast方法允许当前socket client不在该分组内
+    //        //socket.broadcast.to('chrome').emit('event_name',data);
+    //        io.sockets.to('firefox').emit('ff_event',data);
+    //    });
+    //    socket.on('chrome',function(data){
+    //        console.log('here!chrome!',data);
+    //        socket.join('chrome');
+    //        io.sockets.to('chrome').emit('event_name',data);
+    //    });
+    //
+    //    socket.on('subscribe',function(data){
+    //        console.log('welcome to ',data.room);
+    //        socket.join(data.room);
+    //        io.sockets.to('chrome').emit('ff_event',data.room);
+    //    });
+    //
+    //    socket.on('unsubscribe',function(data){
+    //        //
+    //        console.log('byebye!!',data.room);
+    //        socket.leave(data.room);
+    //        io.sockets.to(data.room).emit('event_name',data.room);
+    //        //离开提醒
+    //        io.sockets.to('firefox').emit('ff_event','byebye');
+    //    });
+    //});
+
+    //io.sockets.authorization();
+    var users = [];
+    var reconnect_count = 0;
+
+    //io.use(function(socket,next){
+    //    var handshakeData = socket.handshake.query;
+    //    console.log('handshakeData',handshakeData);
+    //    //if(){
+    //    //
+    //    //}
+    //    users.push(handshakeData)
+    //    next(
+    //    );
+    //});
+
+    console.log('start connection...');
+    io.on('connection',function(socket) {
+        console.log('im connectiongusers',users);
+
+
+        var userInfo = {
+            userid:"",
+            nickname:"",
+            thum:""
+        };
+
+        //init()，一建立连接的时候传入用户信息
+        socket.on('onInit',function(data){
+            //兼容google的傻逼问题，导航栏输入就自动请求
+            if(data.userid == undefined){
+                console.log('没有用户id,没有用户信息');
+                return;
+            }
+            userInfo.userid = data.userid;
+
+            //function convertHeadimgUrl(a){
+            //    console.log(a+"this is string");
+            //    if(a==""){
+            //        return "http://www.geminno.cn/files/user/2015/03-20/185231f8021f174279.jpg";
+            //    }
+            //    return "http://www.geminno.cn/files"+a.substr(8);
+            //}
+
+            //var sql = 'SELECT * from `user` WHERE id = '+data.userid;
+
+            //mysql.econn.query(sql,function(err,rows,fields) {
+            //    if (err) {
+            //        console.log('select error : ' + err);
+            //    } else if (rows.length > 0) {
+            //        var nickname = rows[0].nickname;
+            //        userInfo.nickname = data.nickname = nickname;
+            //        userInfo.thum = data.thum = convertHeadimgUrl(rows[0].smallAvatar);
+            //
+            //        //userInfo.nickname = nickname;
+            //        //userInfo.thum = rows[0].smallAvatar;
+            //
+            //    } else {
+            //        console.log('eeeeelse');
+            //    }
+            //    console.log('iam in oninitttttttttttttttting');
+            //    io.in(socket.id).emit('onInit',data);
+            //}
+
+            userInfo.nickname = data.nickname;
+            userInfo.thum = data.thum;
+            io.in(socket.id).emit('onInit',data);
+
+            //判断用户有没有在线 redis
+            console.log(userInfo,'userinfooooooooooo');
+            console.log('userid'+userInfo.userid);
+
+            //redis.store.multi()
+            //    .exists('userid'+userInfo.userid)
+            //    .sadd("userid"+userInfo.userid,socket.id)
+            //    //.keys("*",function(err,replies){
+            //    //    redis.store.mget(replies,redis.print);
+            //    //})
+            //    //.dbsize()
+            //    .exec(function(err,replies){
+            //        if(err){console.log(err,'redis err multi');}
+            //        console.log("MULTI got "+ replies.length + " replies");
+            //        replies.forEach(function(reply,index) {
+            //            console.log(reply,index);
+            //            if (reply == 0&&index ==0) {
+            //                users.push(userInfo);
+            //                console.log('数组添加成功！',reply,index);
+            //            } else if (reply == 0&&index ==0) {
+            //                console.log('已经存在userid', userInfo.userid);
+            //            }
+            //            else if (reply == 1&&index==1) {
+            //                console.log('插入成功！');
+            //            } else if (reply == 0&&index==1) {
+            //                console.log('插入失败');
+            //            }
+            //        });
+            //    });
+
+            redis.store.exists('userid'+userInfo.userid,function(err,data){
+                console.log(data,'this is data....................');
+                if(err){
+                    console.log('if exists',err);
+                }
+                else{
+                    if(data == 1){
+                        console.log('online users exists');
+                    }else if(data == 0){
+                        console.log('online users not exists');
+                        //function containa(users){
+                        //    if(users.length ==0){
+                        //        return true;
+                        //    }
+                        //    var arr =users.map(function(user){
+                        //        return user.userid;
+                        //    })
+                        //        console.log('new arr',arr);
+                        //    //arr.forEach(function(i){
+                        //    //    if(i==userInfo.id){
+                        //    //        console.log('i=userinfoid comming');
+                        //    //        return false;
+                        //    //    }
+                        //    //});
+                        //    for(var i=0;i<arr.length;i++){
+                        //        if(arr[i]==userInfo.id){
+                        //            return false;
+                        //        }
+                        //    }
+                        //    return true;
+                        //}
+                        //console.log(containa(users),'contain?');
+                        //if(containa(users)){
+                            users.push(userInfo);
+                        //}
+                    }
+
+                    //socket信息存在redis中
+                    redis.store.sadd("userid"+userInfo.userid,socket.id);
+                    console.log(socket.id,data);
+                }
+            });
+        });
+
+        //如果是服务器宕机，客户端重新连接reconnect
+        socket.on('reInit',function(data){
+            reconnect_count++;
+            if(reconnect_count == 1){
+                users = [];
+                console.log('第一次重新链接，清空所有在线用户。。。users');
+            }
+
+            //兼容google的傻逼问题，导航栏输入就自动请求
+            if(data.userid == undefined){
+                console.log('没有用户id,没有用户信息');
+                return;
+            }
+            userInfo.userid = data.userid;
+            //function convertHeadimgUrl(a){
+            //    console.log(a+"this is string");
+            //    if(a==""){
+            //        return "http://www.geminno.cn/files/user/2015/03-20/185231f8021f174279.jpg";
+            //    }
+            //    return "http://www.geminno.cn/files"+a.substr(8);
+            //}
+            //var sql = 'SELECT * from `user` WHERE id = '+data.userid;
+            //mysql.econn.query(sql,function(err,rows,fields) {
+            //    if (err) {
+            //        console.log('select error : ' + err);
+            //    } else if (rows.length > 0) {
+            //        var nickname = rows[0].name;
+            //        userInfo.nickname = data.nickname = nickname;
+            //        userInfo.thum = data.thum = convertHeadimgUrl(rows[0].smallAvatar);
+            //    } else {
+            //        console.log('eeeeelse');
+            //    }
+            //    console.log('iam in oninittttttttttttttting');
+            //    io.in(socket.id).emit('onInit',data);
+            //});
+            userInfo.nickname = data.nickname;
+            userInfo.thum = data.thum;
+            io.in(socket.id).emit('onInit',data);
+
+            //判断用户有没有在线 redis
+            console.log(userInfo,'userinfooooooooooo');
+            console.log('userid'+userInfo.userid);
+
+            redis.store.exists('userid_reconnect'+userInfo.userid,function(err,data){
+                console.log(data,'this is data....................');
+                if(err){
+                    console.log('if exists',err);
+                }
+                else{
+                    if(data == 1){
+                        console.log('online users exists');
+                    }else if(data == 0){
+                        console.log('reconnect:online users not exists');
+                        redis.store.del("userid"+userInfo.userid);
+                        redis.store.sadd("userid"+userInfo.userid,"reconnected");
+                        users.push(userInfo);
+                    }
+
+                    //socket信息存在redis中
+                    redis.store.sadd("userid"+userInfo.userid,socket.id);
+
+                    console.log(socket.id,data);
+                }
+            });
+
+            //设置重新连接延时参数
+            redis.store.setex('userid_reconnect'+userInfo.userid,10,'reconnect');
+        });
+
+
+        //心跳检测，默认客户端每5秒跳动一次
+        socket.conn.on('heartbeat', function() {
+            console.log('heartbeat',socket.id,moment().format('YYYY-MM-DD h:mm:ss'));
+            //服务器端断开，客户端会重新链接
+            //socket.conn.close();
+
+            //服务器端删除socket
+            //socket.disconnect(true);
+
+            //关闭io服务，不能链接
+            //io.close();
+
+            //每次心跳，将用户id对应的key的超时时间设置为60秒
+            if(userInfo.userid){
+                console.log('redis',userInfo.userid);
+                redis.store.expire("userid"+userInfo.userid,60);
+            }
+            var onlineUserInfo = {
+                users:users,
+                count:users.length
+            }
+
+            //获取所有在线人员信息
+            socket.emit('onlineUsers',onlineUserInfo);
+            //console.log('heart break');
+        });
+
+        socket.on('ranFriend',function(){
+            var ranFriendInfo = {
+                users:users,
+                count:users.length
+            };
+            if(users.length<=6){
+                socket.emit('ranFriend',ranFriendInfo);
+            }else{
+                //function getArrayItems(arr,num){
+                //    //var return_arr = new Array();
+                //    //var tempstr = "";
+                //    //while(1){
+                //    //    var index = Math.ceil(Math.random()*(users.length));
+                //    //    var boolstr = "u"+index+"id";
+                //    //    if(tempstr.indexOf(boolstr)>0){
+                //    //        break;
+                //    //    }else{
+                //    //        return_arr.push(arr[index]);
+                //    //        tempstr = tempstr+boolstr;
+                //    //    }
+                //    //}
+                //    //return return_arr;
+                //    var return_arr = [];
+                //    for(var i=0;i<num;i++){
+                //        var index = Math.ceil(Math.random()*(users.length));
+                //        return_arr.push(arr[index-1]);
+                //    }
+                //    return return_arr;
+                //}
+                //ranFriendInfo.users = getArrayItems(users,6);
+
+                function getRanFriend(arr,num){
+                    var return_arr = [];
+                    var index = Math.ceil(Math.random()*(users.length))-1;
+                    if(index+num<=arr.length){
+                        for(var i=index;i<index+num;i++){
+                            return_arr.push(arr[i]);
+                        }
+                    }else if(index+num>arr.length){
+                        for(var i=index;i<arr.length;i++){
+                            return_arr.push(arr[i]);
+                        }
+                        for(var i=0;i<index+num-arr.length;i++){
+                            return_arr.push(arr[i]);
+                        }
+                    }
+                    return return_arr;
+                }
+                ranFriendInfo.users = getRanFriend(users,6);
+
+                socket.emit('ranFriend',ranFriendInfo);
+            }
+        });
+
+
+        //监听聊天信息
+        socket.on('p2c',function(data){
+            //根据用户id查询用户信息
+                    //灌水
+                    if(data.type == 1){
+                        //对本聊天室内所有人发送信息
+                        io.emit('p2c',data);
+                    }
+                    //课程提问
+                    else if(data.type == 2){
+                        //
+                        if(data.to.userid){
+                            console.log("whisper to some",data.to.userid);
+                            redis.store.smembers("userid"+data.to.userid,function(err,res){
+                                if(err){
+                                    console.log('私信错误：'+err);
+                                }
+                                else{
+                                    console.log('here@',res);
+                                    res.forEach(function(i){
+                                        console.log(i,'p2ciiiiiiiiiiiiiiiiiiiiiiii',data);
+                                        io.to(i).emit('p2c',data);
+                                    });
+                                }
+                            });
+                        }
+                    }
+                    //项目提问
+                    else if(data.type == 3){
+                        //对所有人发送提问问题
+                        data.nickname = userInfo.nickname;
+                        io.emit('p2c',data);
+                    }else{
+                        console.log('消息发送不正确！');
+                        return;
+                    }
+        });
+
+        socket.on('p2p',function(data){
+            //私信悄悄话
+            console.log(data.userid);
+            //var arr = redis.store.smembers(data.usserid).keys("*",function(err,replies){
+            //    console.log(replies,'rerererereplies');
+            //});
+            //console.log(arr);
+          /*  redis.store.multi()
+                //.scard(data.userid)
+                .smembers(data.userid)
+                //.keys("*",function(err,replies){
+                //    redis.store.mget(replies,redis.print);
+                //})
+                //.dbsize()
+                .exec(function(err,replies){
+                    console.log("MULTI got "+ replies.length + " replies");
+                    replies.forEach(function(reply,index){
+                        console.log("Reply " + index + ": " + reply);
+                        reply.forEach(function(i){
+                            console.log(i,'iiiiiiiiiiiiiiiiiiiiiiiii');
+                            io.sockets.socket(i).to('chrome').emit('p2p', 'u r in chrome chatroom now!');
+                        })
+                    });
+                });*/
+
+            //redis.store.smembers("userid"+data.userid,function(err,data){
+            //    if(err){
+            //       console.log('私信错误：'+err);
+            //    }
+            //    else{
+            //        console.log('here@',data);
+            //        data.forEach(function(i){
+            //            console.log(i,'iiiiiiiiiiiiiiiiiiiiiiii');
+            //            io.to(i).emit('p2p', 'u r in chrome chatroom now!');
+            //        });
+            //    }
+            //});
+            if(data.to.userid){
+                console.log("whisper to some",data.to.userid);
+                redis.store.smembers("userid"+data.to.userid,function(err,res){
+                    if(err){
+                        console.log('私信错误：'+err);
+                    }
+                    else{
+                        console.log('here@',res);
+                        res.forEach(function(i){
+                            console.log(i,'p2piiiiiiiiiiiiiiiiiiiiiiii',data);
+                            io.to(i).emit('p2p',data);
+                        });
+                    }
+                });
+            }
+            if(data.userid){
+                console.log("send whisper to self");
+                redis.store.smembers("userid"+data.userid,function(err,res){
+                    if(err){
+                        console.log('私信错误self：'+err);
+                    }
+                    else{
+                        console.log('here@self',res);
+                        res.forEach(function(i){
+                            console.log(i,'p2piiiiiiiiiiiiiiiiiiiiiiii',data);
+                            io.to(i).emit('p2p',data);
+                        });
+                    }
+                });
+            }
+
+            //arr.forEach(function(i){
+            //    console.log('foreach i',i);
+            //    io.sockets.socket(i).to('chrome').emit('p2p', 'u r in chrome chatroom now!');
+            //});
+        });
+
+        socket.on('disconnect', function () {
+            io.emit('user disconnected');
+            console.log(socket.id,'disconnect');
+            function removeUser(value){
+                return (value.userid != userInfo.userid);
+            }
+
+            redis.store.scard('userid'+userInfo.userid,function(err,data){
+                    console.log(data,'this is the scard data');
+                if(err){
+                    console.log(err);
+                }else if(data==1){
+                    console.log('here to expire');
+
+                    users = users.filter(removeUser);
+
+                    redis.store.srem('userid'+userInfo.userid,socket.id);
+                    console.log('no need take place !');
+                    //redis.store.sadd('userid'+userInfo.userid,'take place');
+                    //redis.store.expire("userid"+userInfo.userid,10);
+                }else if(data==2){
+                    //redis.store.smembers('userid'+userInfo.userid);
+                    redis.store.smembers("userid"+userInfo.userid,function(err,res){
+                        if(err){
+                            console.log('私信错误：'+err);
+                        }
+                        else{
+                            redis.store.srem('userid'+userInfo.userid,socket.id);
+                            res.forEach(function(i){
+                              if(i =="take place" || i == "reconnected"){
+                                  users = users.filter(removeUser);
+                                  //redis.store.expire("userid"+userInfo.userid,5);
+                                  redis.store.del("userid"+userInfo.userid);
+                              }
+                            });
+                        }
+                    });
+                }
+                else{
+                    console.log('here in srem');
+                    redis.store.srem('userid'+userInfo.userid,socket.id);
+                }
+            });
+        });
+
+
+        //var socketid = socket.id;
+        //console.log(socket.id);
+        //io.sockets.clients().forEach(function (socket) {
+        //    console.log(socket.id);
+        //})
+        //io.clients(function(error, clients){
+        //    if (error) throw error;
+        //    console.log(clients); // => [6em3d4TJP8Et9EMNAAAA, G5p55dHhGgUnLUctAAAB]
+        //});
+
+        socket.on('subscribe', function (data) {
+            socket.join(data.room);
+            console.log('subscribe',data.room);
+            socket.on('mmessage',function(data){
+                console.log(data,'mmessage');
+            });
+        });
+        socket.on('unsubscribe', function (data) {
+            socket.leave(data.room);
+            console.log('unsubscribe',data.room);
+        });
+        console.log('onsubscribe');
+
+
+        socket.on('firefox',function(data){
+            console.log('welcome directive to firefox!',data);
+            socket.join('firefox');
+            //broadcast方法允许当前socket client不在该分组内
+            //socket.broadcast.to('chrome').emit('event_name',data);
+            io.sockets.to('firefox').emit('ff_event',data);
+        });
+
+        socket.on('chrome',function(data){
+            console.log('here!chrome!',data);
+            socket.join('chrome');
+            io.sockets.to('chrome').emit('event_name',data);
+        });
+
+        socket.on('p2p',function(){
+
+        });
+
+
+        ////监听客户端的请求在线消息
+        //socket.on('onlineUsers',function(err,data){
+        //    if(err){
+        //        console.log(err);
+        //    }else{
+        //        console.log(data,'to onlineUsers data');
+        //
+        //        socket.emit('onlineUsers',users);
+        //    }
+        //
+        //    console.log('online,users','aaaaaaaaaaaa',users,users.length);
+        //
+        //    console.log(users,'online users alll------------------------------------------<');
+        //});
+
+        /*setInterval(function () {
+            //socket.broadcast.to('firefox').emit('message','not everyone');
+            io.sockets.to('firefox').emit('message', 'u r in firefox chatroom now!');
+            //console.log(socket.id);
+            //io.in(socket.id).emit('message','not everyone');
+            console.log(io.sockets.sockets.map(function(socket){
+                return socket.id;
+            }));
+            //io.sockets.socket(socketid).to('chrome').emit('message1', 'u r in chrome chatroom now!');
+        }, 5000);
+*/
+        //console.dir(io.sockets.adapter.rooms);
+    });
+};

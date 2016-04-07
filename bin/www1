@@ -1,0 +1,190 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var sockets = require('../sockets');
+var debug = require('debug')('nb:server');
+var http = require('http');
+var redis = require('redis');
+var mysql = require('mysql');
+var moment =require('moment');
+var redisInfo = {
+    port:6379,
+    url:'localhost'
+};
+//创建redis连接
+var pub;
+var sub;
+var store;
+function handleRedis(port,url){
+    pub = redis.createClient(port,url);
+    sub = redis.createClient(port,url);
+    store = redis.createClient(port,url);
+    sub.select(13);
+    store.select(13);
+}
+handleRedis(redisInfo.port,redisInfo.url);
+var redis = {
+    pub:pub,
+    sub:sub,
+    store:store
+};
+
+//创建mysql连接
+//chat信息
+var econn;
+function handleEcpMysql(){
+    econn = mysql.createConnection({
+       host:'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',
+        user:'ecp',
+        password:'CqmygDsx2s_MYSQL',
+        database:'ecp',
+        port:'3306'
+    });
+
+    //连接错误
+    econn.connect(function(err){
+        if(err){
+            console.log('error when connecting to db:',err);
+            setTimeout(handleEcpMysql,2000);
+        }
+
+    });
+
+     econn.on('error', function (err) {
+        console.log('db error', err);
+        // 如果是连接断开，自动重新连接
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            handleEcpMysql();
+        } else {
+            throw err;
+        }
+    });
+}
+var pconn;
+function handleProjectMysql(){
+    pconn = mysql.createConnection({
+        host:'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',
+        user:'ecp',
+        password:'CqmygDsx2s_MYSQL',
+        database:'project',
+        port:'3306'
+    });
+
+    pconn.connect(function(err) {
+        if (err) {
+            console.log("error when connecting to db:", err);
+            setTimeout(handleProjectMysql, 5000);
+        }
+    });
+
+     pconn.on('error', function (err) {
+        console.log('db error', err);
+        // 如果是连接断开，自动重新连接
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            handleProjectMysql();
+        } else {
+            throw err;
+        }
+    });
+};
+//统一初始化
+handleEcpMysql();
+handleProjectMysql();
+var mysql ={
+    econn:econn,
+    pconn:pconn
+};
+
+
+//store.set("onlineUsers","ffff");
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '5000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+console.log(io,'io contents');
+
+//注入socket.io
+sockets(io,redis,mysql,moment);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
