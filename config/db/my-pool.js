@@ -37,7 +37,7 @@ function handlePool () {
             });
             console.log('formal');
         }else if(ipv4 == '120.26.245.233'){
-            conn = mysql.createPool({
+            pool = mysql.createPool({
                 host: 'rdsf39n5tp6w482946xa.mysql.rds.aliyuncs.com',
                 user: 'ecp_test',
                 password: 'ecp_test',
