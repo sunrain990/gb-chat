@@ -6,6 +6,25 @@ var redisInfo = {
     port:6380,
     url:'localhost'
 };
+
+if(os.networkInterfaces().eth1){
+    for(var i=0;i<os.networkInterfaces().eth1.length;i++){
+        if(os.networkInterfaces().eth1[i].family=='IPv4'){
+            ipv4=os.networkInterfaces().eth1[i].address;
+        }
+    }
+    var hostname = os.hostname();
+    //console.log(hostname,ipv4);
+    if(ipv4 == '121.41.41.46'){
+        console.log('dev-redis');
+    }else if(ipv4 == '121.41.123.2'){
+        console.log('formal-redis');
+    }else if(ipv4 == '120.26.245.233'){
+        redisInfo.url = '10.168.161.193';
+        console.log('test-redis');
+    }
+}
+
 //创建redis连接
 var pub;
 var sub;
