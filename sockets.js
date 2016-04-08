@@ -382,11 +382,11 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
 
     var getJinbiyuMsg = function(i){
         if(i==1){
-            return '淅淅沥沥一阵小雨飘过，聊天室在线用户每人获得金币+1奖励';
+            return '淅淅沥沥一阵小雨飘过，全体在线用户每人获得金币+1奖励';
         }else if(i==2){
-            return '不经意间一场雷阵雨已经过去，聊天室在线用户每人获得金币+2奖励';
+            return '不经意间一场雷阵雨已经过去，全体在线用户每人获得金币+2奖励';
         }else if(i==3){
-            return '让暴风雨来的更猛烈些吧，聊天室在线用户每人获得金币+3奖励';
+            return '让暴风雨来的更猛烈些吧，全体在线用户每人获得金币+3奖励';
         }
     }
     ;
@@ -1096,33 +1096,33 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                             prepareRobotReply(data);
                         }
 
-                        //随机奖励用户
-                        if(rewardStatus.status == "generated"){
-                            //console.log('startTime:',startTime,'--getRandomTime',getRandomTime,'--rewardTIme',rewardTime,'--rewardStatus:',rewardStatus.status);
-                            var rewardTime = dt.rewardTime;
-                            //当前获取信息时间
-                            var getMessageTime = moment().valueOf();
-                            var hourTime = moment().format('HH');
-                            if(getMessageTime>rewardTime&&hourTime<= 20&&hourTime>=8){
-                                dt = {
-                                    rewardTime:rewardTime,
-                                    userid:userInfo.userid,
-                                    gold:parseInt(10*Math.random())
-                                };
-                                console.log('取得message时间：',getMessageTime,'奖励时间：',rewardTime);
-                                console.log('开始奖励：'+userInfo.userid,'用户：'+userInfo.nickname,'金币数：'+dt.gold);
-                                reward.emit('addGold',dt);
-                                var tmpdata = data;
-                                tmpdata.type = 4;
-                                tmpdata.time = moment().valueOf();
-                                tmpdata.gold = dt.gold;
-                                tmpdata.thum = userInfo.thum;
-                                tmpdata.notice = "幸运的发言，被系统赠送"+dt.gold+"个金币！";
-                                io.emit('c2p',tmpdata);
-                                rewardStatus.status = "rewarded";
-                                generateReward();
-                            }
-                        }
+                        ////随机奖励用户
+                        //if(rewardStatus.status == "generated"){
+                        //    //console.log('startTime:',startTime,'--getRandomTime',getRandomTime,'--rewardTIme',rewardTime,'--rewardStatus:',rewardStatus.status);
+                        //    var rewardTime = dt.rewardTime;
+                        //    //当前获取信息时间
+                        //    var getMessageTime = moment().valueOf();
+                        //    var hourTime = moment().format('HH');
+                        //    if(getMessageTime>rewardTime&&hourTime<= 20&&hourTime>=8){
+                        //        dt = {
+                        //            rewardTime:rewardTime,
+                        //            userid:userInfo.userid,
+                        //            gold:parseInt(10*Math.random())
+                        //        };
+                        //        console.log('取得message时间：',getMessageTime,'奖励时间：',rewardTime);
+                        //        console.log('开始奖励：'+userInfo.userid,'用户：'+userInfo.nickname,'金币数：'+dt.gold);
+                        //        reward.emit('addGold',dt);
+                        //        var tmpdata = data;
+                        //        tmpdata.type = 4;
+                        //        tmpdata.time = moment().valueOf();
+                        //        tmpdata.gold = dt.gold;
+                        //        tmpdata.thum = userInfo.thum;
+                        //        tmpdata.notice = "幸运的发言，被系统赠送"+dt.gold+"个金币！";
+                        //        io.emit('c2p',tmpdata);
+                        //        rewardStatus.status = "rewarded";
+                        //        generateReward();
+                        //    }
+                        //}
                     }
                     //课程提问
                     else if(data.type == 2){
