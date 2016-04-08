@@ -6,6 +6,7 @@ var redisInfo = {
     port:6380,
     url:'localhost'
 };
+var os = require('os');
 
 if(os.networkInterfaces().eth1){
     for(var i=0;i<os.networkInterfaces().eth1.length;i++){
