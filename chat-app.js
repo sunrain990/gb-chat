@@ -66,8 +66,6 @@ var app = express();
 
 var io = require('socket.io').listen(app.listen(5000));
 
-var Memoto = require('./config/memoto/memoto');
-Memoto.io = io;
 
 var log4js = require('./config/log4js/log4-js');
 
@@ -76,6 +74,9 @@ var sockets = require('./sockets');
 console.log('sisisis');
 //注入socket.io
 sockets(io,Redis,Mysql,Mysql_pool,moment,reward,http,log4js);
+
+var Memoto = require('./config/memoto/memoto');
+Memoto.io = io;
 
 app.use(function(req,res,next){
     console.log('|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||');

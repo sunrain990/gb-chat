@@ -21,7 +21,7 @@ router.post('/chat/notice/ask',function(req,res){
     //    res.json({code:0,text:'失败！'});
     //    return;
     //}
-    
+
     var msg = {
         userid:req.body.userid,
         nickname:req.body.nickname,
@@ -57,6 +57,27 @@ router.post('/chat/notice/answer',function(req,res){
     };
     req.io.emit('c2p',dt);
     res.json({code:1,text:"成功！"});
+});
+
+router.post('/chat/notice/badge',function(req,res){
+    console.log(req.body,'i am badge!');
+    var msg = {
+        badge:req.body.badge,
+        userid:req.body.userid
+    };
+    Redis.store.smembers("userid"+msg.userid,function(err,res){
+        if(err){
+            console.log('私信错误：'+err);
+        }
+        else{
+            res.forEach(function(i){
+                console.log('heheda',i);
+                //Memoto.io.to(i).emit('badge',msg);
+                Memoto.io.in(i).emit('badge',msg);
+            });
+        }
+    });
+    res.json({code:1,text:'success',data:{}});
 });
 
 router.post('/chat/notify1',function(req,res,next){

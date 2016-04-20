@@ -507,9 +507,8 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         socket.on('onInit',function(data){
 
             //zixun
-            my.chat.query('select * from chat.messages where type=5 order by time desc limit 1',function(err,res1){
+            my.chat.query('select * from chat.zixuns order by time desc limit 1',function(err,res1){
                 if(!err){
-
                     for(var i=0;i<res1.length;i++){
                         res1[i].time = moment(res1[i].time).valueOf();
                     }

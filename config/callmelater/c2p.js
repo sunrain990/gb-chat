@@ -7,7 +7,7 @@ var Memoto = require('../memoto/memoto');
 var Mysql = require('../db/my-pool');
 var moment = require('moment');
 
-var cron = '*/20 * * * * *';
+var cron = '*/10 * * * * *';
 var schedule = later.parse.cron(cron,true);
 
 

@@ -40,17 +40,17 @@ function handleRedis(port,url){
     pub.select(12);
     store.select(13);
     sub.select(14);
-    pub.on("error", function(error) {
-        handleRedis();
-    });
-
-    sub.on("error", function(error) {
-        handleRedis();
-    });
-
-    store.on("error", function(error) {
-        handleRedis();
-    });
+    //pub.on("error", function(error) {
+    //    handleRedis();
+    //});
+    //
+    //sub.on("error", function(error) {
+    //    handleRedis();
+    //});
+    //
+    //store.on("error", function(error) {
+    //    handleRedis();
+    //});
 }
 handleRedis(redisInfo.port,redisInfo.url);
 var Redis = {
