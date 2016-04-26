@@ -844,7 +844,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                         data = qs.stringify(data);
                         var opt = {
                             method: "POST",
-                            host: "www.geminno.cn",
+                            host: "www.xmgc360.com",
                             port: 80,
                             path: "/project/index.php/api/user/getinfo",
                             headers: {
@@ -953,25 +953,26 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                                             //    return return_arr;
                                             //}
 
-                                            function getRanFriend(arr,num){
-                                                var return_arr = [];
-                                                var index = Math.ceil(Math.random()*(users.length))-1;
-                                                if(index+num<=arr.length){
-                                                    for(var i=index;i<index+num;i++){
-                                                        return_arr.push(arr[i]);
-                                                    }
-                                                }else if(index+num>arr.length){
-                                                    for(var i=index;i<arr.length;i++){
-                                                        return_arr.push(arr[i]);
-                                                    }
-                                                    for(var i=0;i<index+num-arr.length;i++){
-                                                        return_arr.push(arr[i]);
-                                                    }
-                                                }
-                                                return return_arr;
-                                            }
-
-                                            ranFriendInfo.users = getRanFriend(users,5);
+                                            //function getRanFriend(arr,num){
+                                            //    var return_arr = [];
+                                            //    var index = Math.ceil(Math.random()*(users.length))-1;
+                                            //    if(index+num<=arr.length){
+                                            //        for(var i=index;i<index+num;i++){
+                                            //            return_arr.push(arr[i]);
+                                            //        }
+                                            //    }else if(index+num>arr.length){
+                                            //        for(var i=index;i<arr.length;i++){
+                                            //            return_arr.push(arr[i]);
+                                            //        }
+                                            //        for(var i=0;i<index+num-arr.length;i++){
+                                            //            return_arr.push(arr[i]);
+                                            //        }
+                                            //    }
+                                            //    return return_arr;
+                                            //}
+                                            //
+                                            //ranFriendInfo.users = getRanFriend(users,5);
+                                            ranFriendInfo.users = _.sampleSize(_.uniqBy(users,'thum'), 5);
                                             ranFriendInfo.users.unshift(customer);
                                             socket.emit('ranFriend',ranFriendInfo);
                                         }
