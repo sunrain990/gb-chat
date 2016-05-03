@@ -21,9 +21,9 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     };
 
     var robotReply = {
-      ask:"",
-      status:"ready",
-      word:""
+        ask:"",
+        status:"ready",
+        word:""
     };
 
     function prepareRobotReply(data){
@@ -219,6 +219,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                 if(!err){
 
                     var resed = _.sampleSize(ret, _.random(100,150));
+                    console.log(resed,'this is resed!');
 
                     var rrr = _.map(resed,function(i){
                         return i.id;
@@ -382,15 +383,15 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
 
 
     var getJinbiyuMsg = function(i){
-        if(i==1){
-            return '淅淅沥沥一阵小雨飘过，全体在线用户每人获得金币+1奖励';
-        }else if(i==2){
-            return '不经意间一场雷阵雨已经过去，全体在线用户每人获得金币+2奖励';
-        }else if(i==3){
-            return '让暴风雨来的更猛烈些吧，全体在线用户每人获得金币+3奖励';
+            if(i==1){
+                return '淅淅沥沥一阵小雨飘过，全体在线用户每人获得金币+1奖励';
+            }else if(i==2){
+                return '不经意间一场雷阵雨已经过去，全体在线用户每人获得金币+2奖励';
+            }else if(i==3){
+                return '让暴风雨来的更猛烈些吧，全体在线用户每人获得金币+3奖励';
+            }
         }
-    }
-    ;
+        ;
 
     function jinbiyu(){
         var goldTime = moment().format('HH');
@@ -1060,124 +1061,124 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
 
 
             //根据用户id查询用户信息
-                    //灌水
-                    if(data.type == 1){
-                        storemsg(data);
-                        //对本聊天室内所有人发送信息
+            //灌水
+            if(data.type == 1){
+                storemsg(data);
+                //对本聊天室内所有人发送信息
 
-                        data.time = moment().valueOf();
-                        var edge = 10;
-                        if(messageBox[socketID].length<edge){
-                            messageBox[socketID].push(data);
-                        }else if(messageBox[socketID].length>=edge){
-                            messageBox[socketID].splice(0,1);
-                            messageBox[socketID].push(data);
+                data.time = moment().valueOf();
+                var edge = 10;
+                if(messageBox[socketID].length<edge){
+                    messageBox[socketID].push(data);
+                }else if(messageBox[socketID].length>=edge){
+                    messageBox[socketID].splice(0,1);
+                    messageBox[socketID].push(data);
 
-                            if(messageBox[socketID][messageBox[socketID].length-1].time-messageBox[socketID][0].time<=60000){
-                                console.log('有屌丝在刷金币！！！');
-                                var gdt = {
-                                    userid:data.userid,
-                                    nickname:data.nickname,
-                                    thum:data.thum,
-                                    type:4,
-                                    notice:'非手工刷金币，被无情的T出聊天室！',
-                                    time:moment().valueOf()
-                                };
-                                io.emit('c2p',gdt);
-                                delete messageBox[socketID];
-                                socket.disconnect(true);
-                                return;
-                            }
-                        }
-                        io.emit('p2c',data);
-                        //console.dir(messageBox);
-                        //console.log(messageBox);
-
-                        if(data.to.userid == "000"){
-                            prepareRobotReply(data);
-                        }
-
-                        ////随机奖励用户
-                        //if(rewardStatus.status == "generated"){
-                        //    //console.log('startTime:',startTime,'--getRandomTime',getRandomTime,'--rewardTIme',rewardTime,'--rewardStatus:',rewardStatus.status);
-                        //    var rewardTime = dt.rewardTime;
-                        //    //当前获取信息时间
-                        //    var getMessageTime = moment().valueOf();
-                        //    var hourTime = moment().format('HH');
-                        //    if(getMessageTime>rewardTime&&hourTime<= 20&&hourTime>=8){
-                        //        dt = {
-                        //            rewardTime:rewardTime,
-                        //            userid:userInfo.userid,
-                        //            gold:parseInt(10*Math.random())
-                        //        };
-                        //        console.log('取得message时间：',getMessageTime,'奖励时间：',rewardTime);
-                        //        console.log('开始奖励：'+userInfo.userid,'用户：'+userInfo.nickname,'金币数：'+dt.gold);
-                        //        reward.emit('addGold',dt);
-                        //        var tmpdata = data;
-                        //        tmpdata.type = 4;
-                        //        tmpdata.time = moment().valueOf();
-                        //        tmpdata.gold = dt.gold;
-                        //        tmpdata.thum = userInfo.thum;
-                        //        tmpdata.notice = "幸运的发言，被系统赠送"+dt.gold+"个金币！";
-                        //        io.emit('c2p',tmpdata);
-                        //        rewardStatus.status = "rewarded";
-                        //        generateReward();
-                        //    }
-                        //}
-                    }
-                    //课程提问
-                    else if(data.type == 2){
-                        storemsg(data);
-                        //
-                        if(data.to.userid){
-                            console.log('用户：'+data.userid,'用户名：'+data.nickname+"对->",data.to.userid,' 用户：'+data.to.nickname+'私语：',data.content);
-                            redis.store.smembers("userid"+data.to.userid,function(err,res){
-                                if(err){
-                                    console.log('私信错误：'+err);
-                                }
-                                else{
-                                    //console.log('here@',res);
-                                    res.forEach(function(i){
-                                        console.log('对客户端socketid',i,'私语',data);
-                                        io.to(i).emit('p2c',data);
-                                    });
-                                }
-                            });
-                        }
-                    }
-                    //项目提问
-                    else if(data.type == 3){
-                        var msg = clone(data);
-                        msg.to = JSON.stringify(msg.to);
-                        //data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss');
-                        //data.time = '2014-01-22 01:11:22';
-                        //msg.extra = {};
-                        //msg.extra.faqid = msg.faqid;
-                        //msg.extra.tecdir = msg.tecdir;
-                        //msg.extra = JSON.stringify(msg.extra);
-                        //delete msg.faqid;
-                        //delete msg.tecdir;
-                        msg.lasttime = '';
-                        //console.log('this is p2c --> data!',msg,msg.time);
-                        var msgsql = 'insert into chat.faqs set '+Filtermsg(msg);
-                        //console.log(msgsql,'--->msgsql');
-                        my.chat.query(msgsql,function(err,res){
-                            if(!err){
-                                var id = res.insertId;
-                                //对所有人发送提问问题
-                                data.nickname = userInfo.nickname;
-                                data.time = moment().valueOf();
-                                data.id = id;
-                                io.emit('p2c',data);
-                                console.log(res,'this is insert chatmessages!');
-                            }else{
-                                console.log(err);
-                            }
-                        });
-                    }else{
-                        console.log('消息发送不正确！');
+                    if(messageBox[socketID][messageBox[socketID].length-1].time-messageBox[socketID][0].time<=60000){
+                        console.log('有屌丝在刷金币！！！');
+                        var gdt = {
+                            userid:data.userid,
+                            nickname:data.nickname,
+                            thum:data.thum,
+                            type:4,
+                            notice:'非手工刷金币，被无情的T出聊天室！',
+                            time:moment().valueOf()
+                        };
+                        io.emit('c2p',gdt);
+                        delete messageBox[socketID];
+                        socket.disconnect(true);
                         return;
                     }
+                }
+                io.emit('p2c',data);
+                //console.dir(messageBox);
+                //console.log(messageBox);
+
+                if(data.to.userid == "000"){
+                    prepareRobotReply(data);
+                }
+
+                ////随机奖励用户
+                //if(rewardStatus.status == "generated"){
+                //    //console.log('startTime:',startTime,'--getRandomTime',getRandomTime,'--rewardTIme',rewardTime,'--rewardStatus:',rewardStatus.status);
+                //    var rewardTime = dt.rewardTime;
+                //    //当前获取信息时间
+                //    var getMessageTime = moment().valueOf();
+                //    var hourTime = moment().format('HH');
+                //    if(getMessageTime>rewardTime&&hourTime<= 20&&hourTime>=8){
+                //        dt = {
+                //            rewardTime:rewardTime,
+                //            userid:userInfo.userid,
+                //            gold:parseInt(10*Math.random())
+                //        };
+                //        console.log('取得message时间：',getMessageTime,'奖励时间：',rewardTime);
+                //        console.log('开始奖励：'+userInfo.userid,'用户：'+userInfo.nickname,'金币数：'+dt.gold);
+                //        reward.emit('addGold',dt);
+                //        var tmpdata = data;
+                //        tmpdata.type = 4;
+                //        tmpdata.time = moment().valueOf();
+                //        tmpdata.gold = dt.gold;
+                //        tmpdata.thum = userInfo.thum;
+                //        tmpdata.notice = "幸运的发言，被系统赠送"+dt.gold+"个金币！";
+                //        io.emit('c2p',tmpdata);
+                //        rewardStatus.status = "rewarded";
+                //        generateReward();
+                //    }
+                //}
+            }
+            //课程提问
+            else if(data.type == 2){
+                storemsg(data);
+                //
+                if(data.to.userid){
+                    console.log('用户：'+data.userid,'用户名：'+data.nickname+"对->",data.to.userid,' 用户：'+data.to.nickname+'私语：',data.content);
+                    redis.store.smembers("userid"+data.to.userid,function(err,res){
+                        if(err){
+                            console.log('私信错误：'+err);
+                        }
+                        else{
+                            //console.log('here@',res);
+                            res.forEach(function(i){
+                                console.log('对客户端socketid',i,'私语',data);
+                                io.to(i).emit('p2c',data);
+                            });
+                        }
+                    });
+                }
+            }
+            //项目提问
+            else if(data.type == 3){
+                var msg = clone(data);
+                msg.to = JSON.stringify(msg.to);
+                //data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss');
+                //data.time = '2014-01-22 01:11:22';
+                //msg.extra = {};
+                //msg.extra.faqid = msg.faqid;
+                //msg.extra.tecdir = msg.tecdir;
+                //msg.extra = JSON.stringify(msg.extra);
+                //delete msg.faqid;
+                //delete msg.tecdir;
+                msg.lasttime = '';
+                //console.log('this is p2c --> data!',msg,msg.time);
+                var msgsql = 'insert into chat.faqs set '+Filtermsg(msg);
+                //console.log(msgsql,'--->msgsql');
+                my.chat.query(msgsql,function(err,res){
+                    if(!err){
+                        var id = res.insertId;
+                        //对所有人发送提问问题
+                        data.nickname = userInfo.nickname;
+                        data.time = moment().valueOf();
+                        data.id = id;
+                        io.emit('p2c',data);
+                        console.log(res,'this is insert chatmessages!');
+                    }else{
+                        console.log(err);
+                    }
+                });
+            }else{
+                console.log('消息发送不正确！');
+                return;
+            }
         });
 
         socket.on('p2p',function(data){
@@ -1191,23 +1192,23 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
             //    console.log(replies,'rerererereplies');
             //});
             //console.log(arr);
-          /*  redis.store.multi()
-                //.scard(data.userid)
-                .smembers(data.userid)
-                //.keys("*",function(err,replies){
-                //    redis.store.mget(replies,redis.print);
-                //})
-                //.dbsize()
-                .exec(function(err,replies){
-                    console.log("MULTI got "+ replies.length + " replies");
-                    replies.forEach(function(reply,index){
-                        console.log("Reply " + index + ": " + reply);
-                        reply.forEach(function(i){
-                            console.log(i,'iiiiiiiiiiiiiiiiiiiiiiiii');
-                            io.sockets.socket(i).to('chrome').emit('p2p', 'u r in chrome chatroom now!');
-                        })
-                    });
-                });*/
+            /*  redis.store.multi()
+             //.scard(data.userid)
+             .smembers(data.userid)
+             //.keys("*",function(err,replies){
+             //    redis.store.mget(replies,redis.print);
+             //})
+             //.dbsize()
+             .exec(function(err,replies){
+             console.log("MULTI got "+ replies.length + " replies");
+             replies.forEach(function(reply,index){
+             console.log("Reply " + index + ": " + reply);
+             reply.forEach(function(i){
+             console.log(i,'iiiiiiiiiiiiiiiiiiiiiiiii');
+             io.sockets.socket(i).to('chrome').emit('p2p', 'u r in chrome chatroom now!');
+             })
+             });
+             });*/
 
             //redis.store.smembers("userid"+data.userid,function(err,data){
             //    if(err){
@@ -1437,17 +1438,17 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                         else{
                             redis.store.srem('userid'+userInfo.userid,socket.id);
                             res.forEach(function(i){
-                              if(i =="take place" || i == "reconnected"){
-                                  console.log('其中有reconnected ');
-                                  users = users.filter(removeUser);
-                                  //redis.store.expire("userid"+userInfo.userid,5);
-                                  redis.store.del("userid"+userInfo.userid);
+                                if(i =="take place" || i == "reconnected"){
+                                    console.log('其中有reconnected ');
+                                    users = users.filter(removeUser);
+                                    //redis.store.expire("userid"+userInfo.userid,5);
+                                    redis.store.del("userid"+userInfo.userid);
 
-                                  var dt = {
-                                      status:'offline'
-                                  };
-                                  redis.pub.hmset('user:'+userInfo.userid,dt);
-                              }
+                                    var dt = {
+                                        status:'offline'
+                                    };
+                                    redis.pub.hmset('user:'+userInfo.userid,dt);
+                                }
                             });
                         }
                     });
