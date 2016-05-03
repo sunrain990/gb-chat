@@ -8,6 +8,8 @@ var redisInfo = {
 };
 var os = require('os');
 
+var ipv4;
+
 if(os.networkInterfaces().eth1){
     for(var i=0;i<os.networkInterfaces().eth1.length;i++){
         if(os.networkInterfaces().eth1[i].family=='IPv4'){

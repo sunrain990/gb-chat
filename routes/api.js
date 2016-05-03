@@ -133,69 +133,39 @@ router.post('/chat/notify1',function(req,res,next){
 });
 
 router.post('/chat/notify',function(req,res,next){
-    console.log(req.body,'--------------<<<<<<<');
-    //var targetusers = req.body.targetusers;
-    //var post = req.body.post;
-    //var chat = req.body.id;
-    //console.log(targetusers,post,chat,'6666666');
+    var badge = req.body.badge;
+    var share = req.body.share;
+    var answer = req.body.answer;
+    var gold = req.body.gold;
+    var time = req.body.time;
+    var userid = req.body.userid;
+    var data = req.body.data;
+    var code = req.body.code;
 
-    //Redis.store.smembers("userid"+targetusers,function(err,res){
-    //    if(err){
-    //        console.log('私信错误：'+err);
-    //    }
-    //    else{
-    //        res.forEach(function(i){
-    //            io.to(i).emit('p2p',data);
-    //        });
-    //        res.forEach(function(i){
-    //            console.log('对客户端socketid',i,'私语：',data.id);
-    //            io.to(i).emit('p2p',data);
-    //        });
-    //    }
-    //});
+    console.log(time,userid ,'this is u' + 'serid and time---------------------<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>---------------------');
 
-    var bdata = JSON.parse(req.body.data);
-    console.log(bdata);
-    for(var i=0;i<bdata.length;i++){
-        var userid = bdata[i].targetid;
-        var dt = {
-            text:bdata[i].title
-        };
-        Redis.store.smembers("userid"+userid,function(err,res){
-            if(!err){
-                res.forEach(function(i){
-                    console.log(i,'------this is socketid------',dt);
-                    req.io.to(i).emit('c4p',dt);
-                    //req.io.in(i).emit('c4p',{text:'not everyone!'});
-                });
-            }else{
-                return res.json({code:-1});
-            }
-        });
-    }
-    //var aa = '[{"id":"16373","type":"4","targetid":"1687","time":"2016-01-22 12:11:58","title":"\\u60a8\\u63d0\\u51fa\\u7684\\u95ee\\u9898[gfjhgpuhiuu]\\u6709\\u4e86\\u65b0\\u56de\\u590d\\u70b9\\u51fb<a href=\'\\/_pages\\/faq\\/faqDetails.html?faqid=1670}\'>\\u8fd9\\u91cc<\\/a>","content":"","pics":""}]';
-    //var bb = JSON.parse(aa);
-    //console.log(bb,bb.targetid);
-    //
-    //
-    //var userid = req.body.data.targetid;
-    //
-    //
-    ////var userid = req.body.userid;
-    ////var dt = {
-    ////    text:req.body.title
-    ////};
-    //console.log(userid,dt.text);
-
-
-
-    //var dt = {
-    //    text:'浏阳河，玩过了几道弯！'
-    //};
-    //req.io.emit('c4p',dt);
-    res.json({code:1,text:"成功！",data:{
-        dt:dt
-    }});
+    var msg = {
+        badge:badge,
+        userid:userid,
+        time:time,
+        share:share,
+        gold:gold,
+        data:data,
+        code:code
+    };
+    Redis.store.smembers("userid"+msg.userid,function(err,res){
+        if(err){
+            console.log('私信错误：'+err);
+        }
+        else{
+            res.forEach(function(i){
+                console.log('heheda',i);
+                //Memoto.io.to(i).emit('badge',msg);
+                Memoto.io.in(i).emit('notify',msg);
+            });
+        }
+    });
+    res.json({code:1,text:'success',data:{}});
 });
 
 
