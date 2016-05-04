@@ -434,7 +434,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                 //thum:users[i].thum,
                 time:moment().valueOf(),
                 type:4,
-                notice:getJinbiyuMsg(dt.gold),
+                notice:getJinbiyuMsg(getRanGold),
                 gold:getRanGold
             };
             io.emit('c2p',tmpdt);
