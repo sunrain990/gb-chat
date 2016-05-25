@@ -150,6 +150,8 @@ function C2p(){
                                 content: msg.content
                             };
 
+                            //console.log(msg.content, 'this is msg---content!------------|||||||-----||-------|||');
+
                             var data1 = clone(subDT);
                             //data1.to = JSON.stringify(data1.to);
                             //data.time = moment(data.time).format('YYYY-MM-DD HH:mm:ss');
@@ -166,6 +168,19 @@ function C2p(){
                                         if(res1.insertId){
                                             console.log(res1);
                                             subDT.id = res1.insertId;
+
+                                            var re = /<a/g;
+
+                                            if(!msg.title){
+                                                msg.title = '默认百度统计'
+                                            }
+
+                                            if(typeof subDT.content == 'string'){
+                                                subDT.content = subDT.content.replace(re,function($0){
+                                                    return $0 + ' onclick="_hmt.push(['+"'_trackEvent'"+", 'news', 'click', '"+msg.title+"'])"+'"';
+                                                });
+                                            }
+
                                             Memoto.io.emit('c2p5',subDT);
                                         }
                                     }
