@@ -17,7 +17,7 @@ var addGold = function(userid,gold){
     var uid = userid;
     var token = "ecp is best!!!";
     var gold = gold;
-    var desc = "fromnode";
+    var desc = "金币雨奖励"+gold+"个金币";
     var dt = [];
     dt.push(token);
     dt.push(timestamp);
@@ -42,7 +42,7 @@ var addGold = function(userid,gold){
                 console.log("Got error: " + e.message);
             });
     });
-}
+};
 
 var Reward = function(){
     var self = this;
