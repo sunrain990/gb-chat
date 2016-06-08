@@ -44,6 +44,7 @@ var addGold = function(userid,gold){
     });
 };
 
+
 var Reward = function(){
     var self = this;
     this.on('newListener',function(listener){
