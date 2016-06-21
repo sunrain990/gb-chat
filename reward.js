@@ -33,7 +33,42 @@ var addGold = function(userid,gold){
 
     var paras = "?uid="+uid+"&timestamp="+timestamp+"&signature="+signature+"&gold="+gold+"&desc="+desc;
 
-    http.get('http://www.geminno.cn/project/index.php/api/money/gold_recharge/'+paras, function(res) {
+
+
+    var os = require('os');
+    var ipv4;
+    var goldurl;
+
+    if(os.networkInterfaces().eth1){
+        for(var i=0;i<os.networkInterfaces().eth1.length;i++){
+            if(os.networkInterfaces().eth1[i].family=='IPv4'){
+                ipv4=os.networkInterfaces().eth1[i].address;
+            }
+        }
+        var hostname = os.hostname();
+        //console.log(hostname,ipv4);
+        if(ipv4 == '121.41.41.46'){
+            goldurl = 'http://dev.xmgc360.com/project/index.php/api/money/gold_recharge/';
+            console.log('informal');
+        }else if(ipv4 == '121.41.123.2'){
+            goldurl = 'http://www.xmgc360.com/project/index.php/api/money/gold_recharge/'
+            console.log('formal');
+        }else if(ipv4 == '120.26.245.233'){
+            goldurl = 'http://test.xmgc360.com/project/index.php/api/money/gold_recharge/'
+            console.log('test');
+        }
+    }else if(os.networkInterfaces().lo0){
+        for(var i=0;i<os.networkInterfaces().lo0.length;i++){
+            if(os.networkInterfaces().lo0[i].family=='IPv4'){
+                ipv4=os.networkInterfaces().lo0[i].address;
+            }
+        }
+        if(ipv4 == '127.0.0.1'){
+            console.log('localhost');
+        }
+    }
+
+    http.get(goldurl+paras, function(res) {
         res.on("data", function(data) {
             var jsonData = JSON.parse(data);
             //console.log(jsonData.code,jsonData.text,jsonData.data.gold);
