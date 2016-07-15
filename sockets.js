@@ -52,7 +52,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                 tempdt.userid = 1;
                 tempdt.nickname = "杰米诺";
                 tempdt.thum = '/files/user/2015/10-12/171044464b75564591.png';
-                //tempdt.thum = 'http://www.geminno.cn/files/user/2015/10-12/171044464b75564591.png';
+                //tempdt.thum = 'http://www.xmgc360.com/files/user/2015/10-12/171044464b75564591.png';
                 tempdt.time = data.time+1000;
                 io.emit('p2c',tempdt);
             })
@@ -157,7 +157,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     //            data = qs.stringify(data);
     //            var opt = {
     //                method: "POST",
-    //                host: "www.geminno.cn",
+    //                host: "www.xmgc360.com",
     //                port: 80,
     //                path: "/project/index.php/api/user/getinfo",
     //                headers: {
@@ -234,7 +234,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                         data = qs.stringify(data);
                         var opt = {
                             method: "POST",
-                            host: "www.geminno.cn",
+                            host: "www.xmgc360.com",
                             port: 80,
                             path: "/project/index.php/api/user/getinfo",
                             headers: {
@@ -313,7 +313,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     //                data = qs.stringify(data);
     //                var opt = {
     //                    method: "POST",
-    //                    host: "www.geminno.cn",
+    //                    host: "www.xmgc360.com",
     //                    port: 80,
     //                    path: "/project/index.php/api/user/getinfo",
     //                    headers: {
@@ -429,7 +429,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
             var tmpdt = {
                 //userid:users[i].userid,
                 //nickname:users[i].nickname,
-                //thum:'http://www.geminno.cn/mis/include/imgs/thumtemp.jpg',
+                //thum:'http://www.xmgc360.com/mis/include/imgs/thumtemp.jpg',
                 //thum:users[i].thum,
                 time:moment().valueOf(),
                 type:4,
@@ -443,7 +443,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //var dt = {
         //    userid:1,
         //    nickname:'everyone',
-        //    thum:'http://www.geminno.cn/mis/include/imgs/thumtemp.jpg',
+        //    thum:'http://www.xmgc360.com/mis/include/imgs/thumtemp.jpg',
         //    type:4,
         //    notice:'下金币雨啦！每个在线同学获得1-3个G币'
         //};
@@ -463,9 +463,9 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     setTimeout(jinbiyu,firstGTime);
 
     //var msg1 = '<div><img src="/project/uploads/201511/1/1_20151109180157.jpg" style="height:100px;display:inline-block;vertical-align:top"><div style="display:inline-block;;vertical-align:top"><p style="font-size:14px;color:red;font-weight:bold">微信扫码关注公众号<br>微信回答问题，每次赚取10金币！<br>封号有危险，请注意科学刷钱</p></div></div>';
-    ////var msg1 = '<div><img src="http://www.geminno.cn/project/uploads/201511/1/1_20151109180157.jpg" style="height:100px;display:inline-block;vertical-align:top"><div style="display:inline-block;;vertical-align:top"><p style="font-size:14px;color:red;font-weight:bold">微信扫码关注公众号<br>微信回答问题，每次赚取10金币！<br>封号有危险，请注意科学刷钱</p></div></div>';
+    ////var msg1 = '<div><img src="http://www.xmgc360.com/project/uploads/201511/1/1_20151109180157.jpg" style="height:100px;display:inline-block;vertical-align:top"><div style="display:inline-block;;vertical-align:top"><p style="font-size:14px;color:red;font-weight:bold">微信扫码关注公众号<br>微信回答问题，每次赚取10金币！<br>封号有危险，请注意科学刷钱</p></div></div>';
     //var msg2 = '<a href="/_pages/static/match1510.html" style="cursor:pointer" target="_blank"><img src="/project/uploads/201511/1/1_20151111102212.png" style="width:100%"></a>';
-    ////var msg2 = '<a href="http://www.geminno.cn/_pages/static/match1510.html" style="cursor:pointer" target="_blank"><img src="http://www.geminno.cn/project/uploads/201511/1/1_20151111102212.png" style="width:100%"></a>';
+    ////var msg2 = '<a href="http://www.xmgc360.com/_pages/static/match1510.html" style="cursor:pointer" target="_blank"><img src="http://www.xmgc360.com/project/uploads/201511/1/1_20151111102212.png" style="width:100%"></a>';
     //
     //function noticeAD(){
     //    var subDT = {
@@ -1607,7 +1607,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //    var subDT = {
         //        userid:1,
         //        nickname:"杰米诺",
-        //        thum:'http://www.geminno.cn/files/user/2015/10-12/171044464b75564591.png',
+        //        thum:'http://www.xmgc360.com/files/user/2015/10-12/171044464b75564591.png',
         //        time:moment().valueOf(),
         //        type:4,
         //        notice:'<p style="font-size:18px;font-weight:bold;">课设大赛调查问卷，答就送20金币！<br><a style="font-size:24px;color:red"  href="http://www.sojump.com/jq/5960368.aspx" target="_blank">点我点我！</a>'
