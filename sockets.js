@@ -395,7 +395,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     function jinbiyu(){
         var goldTime = moment().format('HH');
         console.log(goldTime,'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-        if(goldTime <= 24&&goldTime>=0){
+        if(goldTime <= 20&&goldTime>=8){
             function containsID(arr1,comp){
                 for(var i=0;i<arr1.length;i++){
                     if(arr1[i].userid == comp){
@@ -448,12 +448,12 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //    notice:'下金币雨啦！每个在线同学获得1-3个G币'
         //};
         //io.emit('c2p',dt);7200000   5400000
-        var getRanTime = parseInt(120000*Math.random());
+        var getRanTime = parseInt(5400000*Math.random());
         setTimeout(jinbiyu,getRanTime);
         console.log('金币雨将在'+moment(moment().valueOf()+getRanTime).fromNow()+'时间后开始'+'每人奖励'+getRanGold+'个金币！');
     }
 
-    var firstGTime = parseInt(120000*Math.random());
+    var firstGTime = parseInt(5400000*Math.random());
     console.log('金币雨将在'+moment(moment().valueOf()+firstGTime).fromNow()+'时间后开始');
     //var goldTime = moment().format('HH');
     //console.log(goldTime,'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
