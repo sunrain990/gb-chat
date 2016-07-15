@@ -27,6 +27,15 @@ function handlePool () {
                 port: 3306
             });
             console.log('informal');
+        }else if(ipv4 == '120.55.90.62'){
+            pool = mysql.createPool({
+                host: 'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',
+                user: 'ecp',
+                password: 'CqmygDsx2s_MYSQL',
+                database: 'chat',
+                port: 3306
+            });
+            console.log('node formal');
         }else if(ipv4 == '121.41.123.2'){
             pool = mysql.createPool({
                 host: 'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',

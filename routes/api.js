@@ -184,10 +184,16 @@ router.post('/chat/notify',function(req,res,next){
                 console.log('私信错误：'+err);
             }
             else{
-                res.forEach(function(i){
-                    console.log('heheda',i);
+                async.each(res, function(i, callback) {
+                    console.log('hehedaa',userid,'------ - - - -- - - --',i);
                     //Memoto.io.to(i).emit('badge',msg);
                     Memoto.io.in(i).emit('notify',item);
+                }, function(err) {
+                    if(!err) {
+                        console.log('noerr,notify')
+                    }else {
+                        console.log('>done1 notify')
+                    }
                 });
             }
         });

@@ -24,6 +24,8 @@ if(os.networkInterfaces().eth1){
     }else if(ipv4 == '120.26.245.233'){
         redisInfo.url = '10.168.161.193';
         console.log('test-redis');
+    }else if(ipv4 == '120.55.90.62') {
+        redisInfo.url = '10.168.247.105';
     }
 }
 

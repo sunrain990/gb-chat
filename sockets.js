@@ -86,8 +86,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //reward.emit('addGold',dt);
         //setTimeout(doReward,getRandomTime);
     };
-    generateReward();
-
+    // generateReward();
     //设置心跳间隔和心跳超时时间，如果timeout后，服务器端关闭连接
     io.set('heartbeat interval', 5000);
     io.set('heartbeat timeout', 60000);
@@ -396,7 +395,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     function jinbiyu(){
         var goldTime = moment().format('HH');
         console.log(goldTime,'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-        if(goldTime <= 20&&goldTime>=8){
+        if(goldTime <= 24&&goldTime>=0){
             function containsID(arr1,comp){
                 for(var i=0;i<arr1.length;i++){
                     if(arr1[i].userid == comp){
@@ -448,13 +447,13 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //    type:4,
         //    notice:'下金币雨啦！每个在线同学获得1-3个G币'
         //};
-        //io.emit('c2p',dt);7200000
-        var getRanTime = parseInt(5400000*Math.random());
+        //io.emit('c2p',dt);7200000   5400000
+        var getRanTime = parseInt(120000*Math.random());
         setTimeout(jinbiyu,getRanTime);
         console.log('金币雨将在'+moment(moment().valueOf()+getRanTime).fromNow()+'时间后开始'+'每人奖励'+getRanGold+'个金币！');
     }
 
-    var firstGTime = parseInt(5400000*Math.random());
+    var firstGTime = parseInt(120000*Math.random());
     console.log('金币雨将在'+moment(moment().valueOf()+firstGTime).fromNow()+'时间后开始');
     //var goldTime = moment().format('HH');
     //console.log(goldTime,'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
@@ -707,6 +706,60 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                 }
             });
         });
+
+
+        socket.once('onInitBaseTop',function(data){
+            //兼容google的傻逼问题，导航栏输入就自动请求
+            console.log('onInit...',data.room);
+            if(data.userid == undefined){
+                console.log('没有用户id,没有用户信息');
+                return;
+            }
+
+            userInfo.userid = data.userid;
+            userInfo.nickname = data.nickname;
+            userInfo.thum = data.thum;
+            if(data.isofficer){
+                userInfo.isofficer = data.isofficer;
+            }
+            //触发客户端onInit事件
+            io.in(socket.id).emit('onInitBaseTop',data);
+
+            redis.store.exists('userid'+userInfo.userid,function(err,data){
+                console.log(data,'是否存在','userid'+userInfo.userid);
+                if(err){
+                    console.log('if exists',err);
+                }
+                else{
+                    if(data == 1){
+                        console.log('online users '+'userid'+userInfo.userid+'exists');
+                    }else if(data == 0){
+                        console.log('online users '+'userid'+userInfo.userid+'not exists');
+                        users.push(userInfo);
+                        var doc = {
+                            userid: userInfo.userid,
+                            nickname: userInfo.nickname,
+                            thum:userInfo.thum,
+                            loginTime:moment().valueOf(),
+                            logoutTime:moment().valueOf()
+                        };
+
+                        var dt = {
+                            status:'online'
+                        };
+                        redis.pub.hmset('user:'+userInfo.userid,dt);
+                        redis.pub.hmset('user:'+userInfo.userid,doc);
+                    }
+
+                    //socket信息存在redis中
+                    redis.store.sadd("userid"+userInfo.userid,socket.id);
+                    console.log('用户socketid存入redis，socketid为',socket.id);
+                }
+            });
+        });
+
+
+
 
         //如果是服务器宕机，客户端重新连接reconnect
         socket.on('reInit',function(data){

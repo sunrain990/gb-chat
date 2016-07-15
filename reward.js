@@ -18,6 +18,8 @@ var addGold = function(userid,gold){
     var token = "ecp is best!!!";
     var gold = gold;
     var desc = "金币雨奖励"+gold+"个金币";
+    desc = encodeURI(desc);
+
     var dt = [];
     dt.push(token);
     dt.push(timestamp);
@@ -32,8 +34,6 @@ var addGold = function(userid,gold){
     var signature = shasum.digest('hex');
 
     var paras = "?uid="+uid+"&timestamp="+timestamp+"&signature="+signature+"&gold="+gold+"&desc="+desc;
-
-
 
     var os = require('os');
     var ipv4;
