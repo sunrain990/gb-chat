@@ -53,6 +53,9 @@ var addGold = function(userid,gold){
         }else if(ipv4 == '121.41.123.2'){
             goldurl = 'http://www.xmgc360.com/project/index.php/api/money/gold_recharge/'
             console.log('formal');
+        }else if(ipv4 == '120.55.90.62'){
+            goldurl = 'http://www.xmgc360.com/project/index.php/api/money/gold_recharge/'
+            console.log('node formal');
         }else if(ipv4 == '120.26.245.233'){
             goldurl = 'http://test.xmgc360.com/project/index.php/api/money/gold_recharge/'
             console.log('test');
