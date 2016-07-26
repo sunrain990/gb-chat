@@ -392,31 +392,38 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         }
         ;
 
+
+    var jinbiyuTimer = null;
+
+
     function jinbiyu(){
         var goldTime = moment().format('HH');
         console.log(goldTime,'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
         if(goldTime <= 20&&goldTime>=8){
-            function containsID(arr1,comp){
-                for(var i=0;i<arr1.length;i++){
-                    if(arr1[i].userid == comp){
-                        console.log('yes');
-                        return true;
-                    }
-                }
-                console.log('no');
-                return false;
-            }
+            clearTimeout(jinbiyuTimer);
+            // function containsID(arr1,comp){
+            //     for(var i=0;i<arr1.length;i++){
+            //         if(arr1[i].userid == comp){
+            //             console.log('yes');
+            //             return true;
+            //         }
+            //     }
+            //     console.log('no');
+            //     return false;
+            // }
+            //
+            // var rmDup = function(arr){
+            //     var tmparr = [];
+            //     for(var i=0;i<arr.length;i++){
+            //         if(!containsID(tmparr,arr[i].userid)){
+            //             tmparr.push(arr[i]);
+            //         }
+            //     }
+            //     return tmparr;
+            // }
+            // users = rmDup(users);
 
-            var rmDup = function(arr){
-                var tmparr = [];
-                for(var i=0;i<arr.length;i++){
-                    if(!containsID(tmparr,arr[i].userid)){
-                        tmparr.push(arr[i]);
-                    }
-                }
-                return tmparr;
-            }
-            users = rmDup(users);
+            users = _.uniqBy(users,'userid');
 
             var getRanGold = parseInt(3*Math.random())+1;
             for(var i=0;i<users.length;i++){
@@ -426,6 +433,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
                 };
                 reward.emit('addGold',dt);
             }
+            //统一php处理消息
             var tmpdt = {
                 //userid:users[i].userid,
                 //nickname:users[i].nickname,
@@ -449,7 +457,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         //};
         //io.emit('c2p',dt);7200000   5400000
         var getRanTime = parseInt(5400000*Math.random());
-        setTimeout(jinbiyu,getRanTime);
+        jinbiyuTimer = setTimeout(jinbiyu,getRanTime);
         console.log('金币雨将在'+moment(moment().valueOf()+getRanTime).fromNow()+'时间后开始'+'每人奖励'+getRanGold+'个金币！');
     }
 
@@ -460,7 +468,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     //if(goldTime>=20||goldTime<=8){
     //    console.log('asdfasfdasfasdddddddddddddddddddddddddddddddddddddddasfdasfdasfs++++++++++++');
     //}
-    setTimeout(jinbiyu,firstGTime);
+    jinbiyuTimer = setTimeout(jinbiyu,firstGTime);
 
     //var msg1 = '<div><img src="/project/uploads/201511/1/1_20151109180157.jpg" style="height:100px;display:inline-block;vertical-align:top"><div style="display:inline-block;;vertical-align:top"><p style="font-size:14px;color:red;font-weight:bold">微信扫码关注公众号<br>微信回答问题，每次赚取10金币！<br>封号有危险，请注意科学刷钱</p></div></div>';
     ////var msg1 = '<div><img src="http://www.xmgc360.com/project/uploads/201511/1/1_20151109180157.jpg" style="height:100px;display:inline-block;vertical-align:top"><div style="display:inline-block;;vertical-align:top"><p style="font-size:14px;color:red;font-weight:bold">微信扫码关注公众号<br>微信回答问题，每次赚取10金币！<br>封号有危险，请注意科学刷钱</p></div></div>';
@@ -708,7 +716,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
         });
 
 
-        socket.once('onInitBaseTop',function(data){
+        socket.on('onInitBaseTop',function(data){
             //兼容google的傻逼问题，导航栏输入就自动请求
             console.log('onInit...',data.room);
             if(data.userid == undefined){

@@ -12,7 +12,7 @@ var createTimeStamp = function () {
 };
 
 //加金币
-var addGold = function(userid,gold){
+var addGoldG = function(userid,gold){
     var timestamp = createTimeStamp();
     var uid = userid;
     var token = "ecp is best!!!";
@@ -93,7 +93,7 @@ var Reward = function(){
         console.log(data,'i am adding gold');
         //var userid = data.userid;
         //var gold = data.gold;
-        addGold(data.userid,data.gold);
+        addGoldG(data.userid,data.gold);
         console.log(data.userid,'adding gold success');
     });
 };
