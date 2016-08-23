@@ -184,7 +184,6 @@ function C2p(){
                                             Memoto.io.emit('c2p5',subDT);
                                         }
                                     }
-
                                     connection.release();
                                 }else{
                                     console.log(err);
@@ -197,10 +196,12 @@ function C2p(){
                             connection.release();
                         }
                     }else{
+                        connection.release();
                         console.log(err);
                     }
                 });
             }else{
+                connection.release();
                 console.log(err);
             }
         });

@@ -20,6 +20,7 @@ function handlePool () {
         //console.log(hostname,ipv4);
         if(ipv4 == '121.41.41.46'){
             pool = mysql.createPool({
+                connectionLimit : 10,
                 host: 'rdsf39n5tp6w482946xa.mysql.rds.aliyuncs.com',
                 user: 'ecp_test',
                 password: 'Gem231320',
@@ -29,6 +30,7 @@ function handlePool () {
             console.log('informal');
         }else if(ipv4 == '120.55.90.62'){
             pool = mysql.createPool({
+                connectionLimit : 10,
                 host: 'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',
                 user: 'ecp',
                 password: 'CqmygDsx2s_MYSQL',
@@ -38,6 +40,7 @@ function handlePool () {
             console.log('node formal');
         }else if(ipv4 == '121.41.123.2'){
             pool = mysql.createPool({
+                connectionLimit : 10,
                 host: 'rdsvy6jrfrbi2a2.mysql.rds.aliyuncs.com',
                 user: 'ecp',
                 password: 'CqmygDsx2s_MYSQL',
@@ -47,6 +50,7 @@ function handlePool () {
             console.log('formal');
         }else if(ipv4 == '120.26.245.233'){
             pool = mysql.createPool({
+                connectionLimit : 10,
                 host: 'rdsf39n5tp6w482946xa.mysql.rds.aliyuncs.com',
                 user: 'ecp_test',
                 password: 'Gem231320',
@@ -63,6 +67,7 @@ function handlePool () {
         }
         if(ipv4 == '127.0.0.1'){
             pool = mysql.createPool({
+                connectionLimit : 10,
                 host: 'localhost',
                 user: 'root',
                 password: 'root',
