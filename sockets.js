@@ -27,7 +27,7 @@ module.exports =function(io,redis,my,mysql_pool,moment,reward,http,log4js){
     };
 
     function prepareRobotReply(data){
-        http.get('http://www.tuling123.com/openapi/api?key=242aa6c8faa47c5e51d4ce4b3a3da7bb&info='+data.content, function(res) {
+        http.get('http://www.tuling123.com/openapi/api?key=682413ce69cc470b9c9db2fd3f0a2e33&info='+data.content, function(res) {
             res.on("data", function(resdt) {
                 //robotReply.status = "standby";
                 var jsonData = JSON.parse(resdt);
